@@ -107,4 +107,17 @@ def signup_for_activity(activity_name: str, email: str):
     return {"message": f"Signed up {email} for {activity_name}"}
 
 
-    
+@app.post("/activities/{activity_name}/unregister")
+def unregister_from_activity(activity_name: str, email: str):
+    """Remove a student from an activity"""
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    activity = activities[activity_name]
+    # Use case-insensitive comparison for email
+    for i, participant in enumerate(activity["participants"]):
+        if participant.lower() == email.lower():
+            del activity["participants"][i]
+            return {"message": f"Removed {email} from {activity_name}"}
+    raise HTTPException(status_code=404, detail="Participant not found in this activity")
+
+
